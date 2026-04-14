@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Health Monitor</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Live Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="app-container">
+        
+        <!-- 1. Splash Screen -->
+        <section id="splash-screen" class="screen active">
+            <div class="splash-content">
+                <div class="logo-box">
+                    <div class="heart-pulse"><i class="fa-solid fa-heart-pulse"></i></div>
+                    <div class="band-icon"><i class="fa-solid fa-watch-fitness"></i></div>
+                </div>
+                <h1 class="app-title">Health Monitor</h1>
+                <div class="loader">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Login / Signup Screen -->
+        <section id="auth-screen" class="screen">
+            <div class="header-curve"></div>
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Monitor your health in real-time</p>
+                </div>
+                
+                <form class="auth-form" id="login-form">
+                    <div class="input-group">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password-input" placeholder="Password" required>
+                        <i class="fa-regular fa-eye-slash toggle-password" id="toggle-pw"></i>
+                    </div>
+                    <button type="button" class="btn primary-btn" onclick="navigateTo('home-screen')">Login</button>
+                    <p class="signup-prompt">Don't have an account? <a href="#">Sign up</a></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- Navigation Bar (Shared across inner screens) -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-target="home-screen">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-target="live-screen">
+                <i class="fa-solid fa-wave-square"></i>
+                <span>Live</span>
+            </a>
+            <a href="#" class="nav-item" data-target="history-screen">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+            <a href="#" class="nav-item" data-target="settings-screen">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- 3. Home Dashboard Screen -->
+        <section id="home-screen" class="screen inner-screen">
+            <header class="top-bar">
+                <div class="user-greeting">
+                    <h3>Hi, Alex</h3>
+                    <p>How are you feeling today?</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn notification-btn" onclick="navigateTo('alerts-screen')">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="badge" id="alert-badge" style="display:none;">!</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="device-status-card connected" id="device-status">
+                <div class="status-left">
+                    <i class="fa-brands fa-bluetooth-b bt-icon"></i>
+                    <div>
+                        <h4 id="status-text">Smart Band Connected</h4>
+                        <p>Syncing in real-time</p>
+                    </div>
+                </div>
+                <div class="battery">
+                    <i class="fa-solid fa-battery-three-quarters"></i>
+                    <span>75%</span>
+                </div>
+            </div>
+
+            <div class="health-grid">
+                <!-- Heart Rate -->
+                <div class="health-card">
+                    <div class="card-header">
+                        <div class="icon-bg bg-red"><i class="fa-solid fa-heart fa-beat"></i></div>
+                        <span>Heart Rate</span>
+                    </div>
+                    <div class="card-value">
+                        <h2 id="home-bpm">72</h2>
+                        <span class="unit">bpm</span>
+                    </div>
+                    <div class="card-footer normal">
+                        <i class="fa-solid fa-circle-check"></i> Normal
+                    </div>
+                </div>
+
+                <!-- Blood Pressure -->
+                <div class="health-card">
+                    <div class="card-header">
+                        <div class="icon-bg bg-blue"><i class="fa-solid fa-droplet"></i></div>
+                        <span>Blood Pressure</span>
+                    </div>
+                    <div class="card-value">
+                        <h2 id="home-bp">120<span class="small-slash">/80</span></h2>
+                        <span class="unit">mmHg</span>
+                    </div>
+                    <div class="card-footer normal">
+                        <i class="fa-solid fa-circle-check"></i> Optimal
+                    </div>
+                </div>
+
+                <!-- Temperature -->
+                <div class="health-card full-width">
+                    <div class="card-header">
+                        <div class="icon-bg bg-orange"><i class="fa-solid fa-temperature-half"></i></div>
+                        <span>Body Temperature</span>
+                    </div>
+                    <div class="card-value-row">
+                        <div class="card-value">
+                            <h2 id="home-temp">36.5</h2>
+                            <span class="unit">°C</span>
+                        </div>
+                        <div class="temp-indicator"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Live Monitoring Screen -->
+        <section id="live-screen" class="screen inner-screen">
+            <header class="top-bar">
+                <h3>Live Monitoring</h3>
+            </header>
+            
+            <div class="live-visualizer">
+                <div class="live-value-large">
+                    <i class="fa-solid fa-heart fa-beat" style="color: #ff4757;"></i>
+                    <h1 id="live-bpm-display">72</h1>
+                    <span>BPM</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bpmChart"></canvas>
+                </div>
+            </div>
+
+            <div class="live-stats">
+                <div class="stat-item">
+                    <p>Avg</p>
+                    <h4>74 BPM</h4>
+                </div>
+                <div class="stat-item">
+                    <p>Min</p>
+                    <h4>65 BPM</h4>
+                </div>
+                <div class="stat-item">
+                    <p>Max</p>
+                    <h4>85 BPM</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. History Screen -->
+        <section id="history-screen" class="screen inner-screen">
+            <header class="top-bar">
+                <h3>History</h3>
+            </header>
+            
+            <div class="filter-tabs">
+                <button class="tab active">Daily</button>
+                <button class="tab">Weekly</button>
+                <button class="tab">Monthly</button>
+            </div>
+
+            <div class="history-list">
+                <div class="history-item">
+                    <div class="history-date">
+                        <h4>Today</h4>
+                        <p>10:30 AM</p>
+                    </div>
+                    <div class="history-data">
+                        <div class="data-pill"><i class="fa-solid fa-heart"></i> 72</div>
+                        <div class="data-pill"><i class="fa-solid fa-droplet"></i> 120/80</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">
+                        <h4>Yesterday</h4>
+                        <p>08:15 PM</p>
+                    </div>
+                    <div class="history-data">
+                        <div class="data-pill"><i class="fa-solid fa-heart"></i> 68</div>
+                        <div class="data-pill"><i class="fa-solid fa-droplet"></i> 118/78</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">
+                        <h4>12 Apr</h4>
+                        <p>09:00 AM</p>
+                    </div>
+                    <div class="history-data">
+                        <div class="data-pill warning"><i class="fa-solid fa-heart"></i> 95</div>
+                        <div class="data-pill"><i class="fa-solid fa-droplet"></i> 125/82</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Alerts Screen -->
+        <section id="alerts-screen" class="screen inner-screen">
+            <header class="top-bar">
+                <button class="back-btn" onclick="navigateTo('home-screen')"><i class="fa-solid fa-arrow-left"></i></button>
+                <h3>Alerts & Warnings</h3>
+                <div style="width: 24px;"></div> <!-- Spacer -->
+            </header>
+
+            <div class="alerts-list">
+                <div class="alert-card danger">
+                    <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="alert-desc">
+                        <h4>High Heart Rate Detected</h4>
+                        <p>Your heart rate spiked to 110 BPM while resting.</p>
+                        <span class="alert-time">Just now</span>
+                    </div>
+                </div>
+                
+                <div class="alert-card warning">
+                    <div class="alert-icon"><i class="fa-solid fa-droplet"></i></div>
+                    <div class="alert-desc">
+                        <h4>Elevated Blood Pressure</h4>
+                        <p>Your BP is 135/90. Consider resting.</p>
+                        <span class="alert-time">Yesterday, 14:30</span>
+                    </div>
+                </div>
+
+                <div class="alert-card info">
+                    <div class="alert-icon"><i class="fa-solid fa-battery-quarter"></i></div>
+                    <div class="alert-desc">
+                        <h4>Band Battery Low</h4>
+                        <p>Please charge your device soon.</p>
+                        <span class="alert-time">2 days ago</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Settings Screen -->
+        <section id="settings-screen" class="screen inner-screen">
+            <header class="top-bar">
+                <h3>Settings</h3>
+            </header>
+            
+            <div class="settings-profile">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="profile-info">
+                    <h2>Alex Johnson</h2>
+                    <p>alex.johnson@example.com</p>
+                </div>
+                <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+            </div>
+
+            <div class="settings-group">
+                <h4>Device Operations</h4>
+                <div class="setting-item">
+                    <div class="setting-item-left">
+                        <div class="icon-bg bg-blue"><i class="fa-brands fa-bluetooth-b"></i></div>
+                        <span>Smart Band Connection</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="bt-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-item-left">
+                        <div class="icon-bg bg-green"><i class="fa-solid fa-rotate"></i></div>
+                        <span>Auto-Sync Data</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h4>Notifications</h4>
+                <div class="setting-item">
+                    <div class="setting-item-left">
+                        <div class="icon-bg bg-orange"><i class="fa-solid fa-bell"></i></div>
+                        <span>Health Alerts</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn danger-outline-btn logout-btn" onclick="navigateTo('auth-screen')">
+                <i class="fa-solid fa-right-from-bracket"></i> Log Out
+            </button>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
